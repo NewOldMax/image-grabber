@@ -60,12 +60,20 @@ def get_request_item(request_id):
         item = RequestItem.query.get(request_id))
 
 @app.route('/createtbl')
-def createUserTable():
+def createTable():
 	try:
 		db.create_all()
 		return json.dumps({'status':True})
 	except IntegrityError:
 		return json.dumps({'status':False})
+
+@app.route('/droptbl')
+def dropTable():
+    try:
+        db.drop_all()
+        return json.dumps({'status':True})
+    except IntegrityError:
+        return json.dumps({'status':False})
 
 if __name__ == "__main__":
 	app.config['SECRET_KEY'] = 'dkfj273hf784h1dj98q'
