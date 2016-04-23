@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post" name="login" class="form">
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-9">
+            <div class="form-group">
+                {{form.site_url.label}}
+                {{form.site_url(class='form-control', required=true)}}
+                {% for error in form.errors.site_url %}
+                    <p class="text-danger text-left">[{{error}}]</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{form.image_count.label}}
+                {{form.image_count(class='form-control', required=true)}}
+                {% for error in form.errors.image_count %}
+                    <p class="text-danger text-left">[{{error}}]</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Grab</button>
+</form>
+{% if requests %}
+    {% for item in requests %}
+        <div class="request-item">
+            <h3><a href="{{url_for('get_request_item', request_id=item.id)}}">{{item.title}}</a></h3>
+            <p>Status: {{item.status}}</p>
+            <p>Images: {{item.images.count()}}/{{item.count}}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

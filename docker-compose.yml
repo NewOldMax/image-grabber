@@ -1,0 +1,16 @@
+web:
+  build: .
+  command: python /code/app/app.py
+  ports:
+   - "8082:8082"
+  volumes:
+   - .:/code
+  links:
+   - db
+  hostname: myappserver
+db:
+  hostname: mysqlserver
+  image: orchardup/mysql
+  environment:
+     MYSQL_ROOT_PASSWORD: gvj179qhw98R
+     MYSQL_DATABASE: image-grabber
