@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="" method="post" name="login" class="form">
+<form action="" method="post" name="login" class="form" id="grab-form">
     {{ form.hidden_tag() }}
     <div class="row">
         <div class="col-md-9">
@@ -30,6 +30,7 @@
         <div class="request-item">
             <h3><a href="{{url_for('get_request_item', request_id=item.id)}}">{{item.title}}</a></h3>
             <p>Status: {{item.status}}</p>
+            <p>Info: {{item.info}}</p>
             <p>Images: {{item.images.count()}}/{{item.count}}</p>
         </div>
     {% endfor %}

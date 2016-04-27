@@ -8,3 +8,5 @@ Flask-Migrate
 simplejson
 grab==0.6.30
 pycurl==7.19.5.3
+flask-socketio
+eventlet

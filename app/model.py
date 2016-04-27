@@ -27,6 +27,7 @@ class RequestItem(db.Model):
 	status = db.Column(db.String(255))
 	count = db.Column(db.String(255))
 	images = db.relationship("Image", lazy='dynamic')
+	info = db.Column(db.String(255))
 
 	def __init__(self, url, count, title, status):
 		self.url = url

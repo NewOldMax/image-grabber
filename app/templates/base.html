@@ -12,12 +12,15 @@
     <script src="//code.jquery.com/jquery-latest.js"></script>
     <script src="//getbootstrap.com/dist/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.1/owl.carousel.min.js"></script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/script.js') }}"></script>
 </head>
  
 <body>
  
     <div class="container">
-        <h1>Image Grabber</h1>
+        <h1><a href="{{url_for('index')}}">Image Grabber</a></h1>
 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
