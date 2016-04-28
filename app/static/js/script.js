@@ -10,6 +10,16 @@ $(document).ready(function(){
         });
     });
 
+    $('#work_type').change(function(){
+        if ($(this).val() == 'crawler') {
+            $(this).parent().append('<p class="text-danger text-left">Non controlled grab!</p>');
+            $('#image_count').attr('disabled', 'disabled');
+        } else {
+            $(this).parent().find('p').remove();
+            $('#image_count').removeAttr('disabled');
+        }
+    });
+
     $('#grab-form').submit(function() {
         var form = $(this);
         var count = form.find('#image_count').val();
