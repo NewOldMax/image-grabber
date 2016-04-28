@@ -5,7 +5,7 @@ import random
 
 from grab.spider import Spider, Task
 from model import RequestItem, Image, db
-from flask_socketio import SocketIO, emit
+from app import app, socketio
 
 class Spider(Spider):
     def prepare(self):
@@ -35,7 +35,8 @@ class Spider(Spider):
         self.request_item.status = self.status
         self.request_item.info = self.info
         db.session.commit()
-        emit('finish', 'finish')
+        with app.test_request_context('/'):
+            socketio.emit('finish', 'finish')
 
     def task_link(self, grab, task):
         for image in grab.doc.select('//img'):
@@ -53,7 +54,8 @@ class Spider(Spider):
                     filename)
                 db.session.add(image_item)
                 self.index += 1
-                emit('grabed_count', populated)
+                with app.test_request_context('/'):
+                    socketio.emit('grabed_count')
                 eventlet.greenthread.sleep(0)
             except Exception as e:
                 continue
