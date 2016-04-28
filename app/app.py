@@ -9,6 +9,7 @@ from flask import Flask, request, render_template, redirect, url_for, copy_curre
 from flask_socketio import SocketIO, emit
 from model import RequestItem, Image, db
 from forms import GrabberForm
+from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from grab import Grab
 from spider import Spider
@@ -102,8 +103,13 @@ def grab_single(data):
     request_item.status = status
     request_item.info = info
     db.session.commit()
-    emit('finish', 'finish', namespace='/main')
+    emit('finish', 'saving', namespace='/main')
     eventlet.sleep(0)
+
+def after_commit_listener(mapper, connection, target):
+    emit('finish', 'finish', namespace='/main')
+
+event.listen(RequestItem, 'after_insert', after_commit_listener)
 
 if __name__ == "__main__":
     app.config['SECRET_KEY'] = 'dkfj273hf784h1dj98q'
