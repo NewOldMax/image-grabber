@@ -4,7 +4,7 @@
 <form action="" method="post" name="login" class="form" id="grab-form">
     {{ form.hidden_tag() }}
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-6">
             <div class="form-group">
                 {{form.site_url.label}}
                 {{form.site_url(class='form-control', required=true)}}
@@ -18,6 +18,15 @@
                 {{form.image_count.label}}
                 {{form.image_count(class='form-control', required=true)}}
                 {% for error in form.errors.image_count %}
+                    <p class="text-danger text-left">[{{error}}]</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{form.work_type.label}}
+                {{form.work_type(class='form-control', required=true)}}
+                {% for error in form.errors.work_type %}
                     <p class="text-danger text-left">[{{error}}]</p>
                 {% endfor %}
             </div>

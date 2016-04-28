@@ -7,6 +7,8 @@ from grab.spider import Spider, Task
 from model import RequestItem, Image, db
 from app import app, socketio
 
+eventlet.monkey_patch()
+
 class Spider(Spider):
     def prepare(self):
         self.base_url = self.initial_urls[0]
@@ -36,7 +38,8 @@ class Spider(Spider):
         self.request_item.info = self.info
         db.session.commit()
         with app.test_request_context('/'):
-            socketio.emit('finish', 'finish')
+            socketio.emit('finish', 'finish', namespace='/main')
+        eventlet.sleep(0)
 
     def task_link(self, grab, task):
         for image in grab.doc.select('//img'):
@@ -55,7 +58,7 @@ class Spider(Spider):
                 db.session.add(image_item)
                 self.index += 1
                 with app.test_request_context('/'):
-                    socketio.emit('grabed_count')
-                eventlet.greenthread.sleep(0)
+                    socketio.emit('grabed_count', self.index, namespace='/main')
+                eventlet.sleep(0)
             except Exception as e:
                 continue

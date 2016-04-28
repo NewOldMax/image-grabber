@@ -1,4 +1,4 @@
-var socket = io.connect('http://' + document.domain + ':' + location.port);
+var socket = io.connect('http://' + document.domain + ':' + location.port + '/main');
 $(document).ready(function(){
     socket.on('connect', function() {
         console.log('connected');
@@ -13,8 +13,9 @@ $(document).ready(function(){
     $('#grab-form').submit(function() {
         var form = $(this);
         var count = form.find('#image_count').val();
-        var url = form.find('#site_url').val()
-        send(url, count);
+        var url = form.find('#site_url').val();
+        var event = 'grab_'+form.find('#work_type').val();
+        send(event, url, count);
         startLoading($('body'));
         $('#current').text(0);
         $('#total').text(count);
@@ -22,8 +23,8 @@ $(document).ready(function(){
     });
 })
 
-function send(url, count) {
-    socket.emit('grab', {
+function send(event, url, count) {
+    socket.emit(event, {
         site_url: url,
         image_count: parseInt(count)
     });
