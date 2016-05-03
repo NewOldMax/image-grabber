@@ -1,3 +1,4 @@
+from __future__ import print_function
 import urllib
 import eventlet
 import os
@@ -17,48 +18,69 @@ class Spider(Spider):
             self.initial_urls[0],
             self.total,
             '',
-            self.status
+            self.result_status
         )
         db.session.add(self.request_item)
-        self.index = 0
+        self.result_counter = 0
+        self.urls = [];
 
     def task_initial(self, grab, task):
         self.request_item.title = grab.doc.select('//title').text()
         for elem in grab.xpath_list('//a[not(contains(@href, "http"))]'):
-            if (self.index == self.total):
-                self.status = 'success'
+            if (self.result_counter >= self.total):
+                self.result_status = 'success'
                 self.info = 'All images grabbed'
-                break
+                self.request_item.status = self.result_status
+                self.request_item.info = self.info
+                db.session.commit()
+                with app.app_context():
+                    socketio.emit('finish', 'finish', namespace='/main')
+                eventlet.sleep(0)
+                self.stop()
+                return
             else:
-                yield Task('link', url=elem.get('href'))
-        if (self.index != self.total):
-            self.status = 'error'
+                if elem.get('href') not in self.urls:
+                    self.urls.append(elem.get('href'))
+                    yield Task('link', url=elem.get('href'))
+        if (self.result_counter != self.total):
+            self.result_status = 'error'
             self.info = 'Not of all images grabbed'
-        self.request_item.status = self.status
-        self.request_item.info = self.info
-        db.session.commit()
-        with app.test_request_context('/'):
-            socketio.emit('finish', 'finish', namespace='/main')
-        eventlet.sleep(0)
+        else:
+            self.request_item.status = self.result_status
+            self.request_item.info = self.info
+            db.session.commit()
+            with app.app_context():
+                socketio.emit('finish', 'finish', namespace='/main')
+            eventlet.sleep(0)
+            self.stop()
 
     def task_link(self, grab, task):
         for image in grab.doc.select('//img'):
             try:
-                if (self.index >= self.total):
-                    self.status = 'success'
-                    break
+                if (self.result_counter >= self.total):
+                    self.result_status = 'success'
+                    self.info = 'All images grabbed'
+                    self.request_item.status = self.result_status
+                    self.request_item.info = self.info
+                    db.session.commit()
+                    with app.app_context():
+                        socketio.emit('finish', 'finish', namespace='/main')
+                    eventlet.sleep(0)
+                    self.stop()
+                    return
                 src = image.attr('src')
                 hash = os.urandom(16).encode('hex')
                 filename = hash + src.split('/')[-1]
                 self.downloader.retrieve(src, 'app/static/images/' + filename)
+                self.result_counter += 1
+                eventlet.sleep(0)
                 image_item = Image(
                     self.request_item,
                     src,
                     filename)
                 db.session.add(image_item)
-                self.index += 1
-                with app.test_request_context('/'):
-                    socketio.emit('grabed_count', self.index, namespace='/main')
+                with app.app_context():
+                    socketio.emit('grabed_count', self.result_counter, namespace='/main')
                 eventlet.sleep(0)
             except Exception as e:
                 continue

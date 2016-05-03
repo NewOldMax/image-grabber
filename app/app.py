@@ -19,6 +19,7 @@ logger = logging.getLogger('grab')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
+
 downloader = urllib.URLopener()
 
 # initate flask app
@@ -56,16 +57,16 @@ def dropTable():
 
 @socketio.on('grab_crawler', namespace='/main')
 def grab_crawler(data):
-    bot = Spider()
+    bot = Spider(thread_number=1)
     bot.initial_urls = [data['site_url']]
     bot.total = data['image_count']
-    bot.status = 'inprogress'
+    bot.result_status = 'inprogress'
     bot.run()
 
 @socketio.on('grab_single', namespace='/main')
 def grab_single(data):
     g = Grab()
-    g.setup(log_file='log.html', connect_timeout=5, timeout=5)
+    g.setup(log_file='log.html')
     g.go(data['site_url'])
     total = data['image_count']
     status = 'inprogress'
@@ -103,6 +104,7 @@ def grab_single(data):
     request_item.status = status
     request_item.info = info
     db.session.commit()
+    db.session.expire(request_item)
     emit('finish', 'saving', namespace='/main')
     eventlet.sleep(0)
 
