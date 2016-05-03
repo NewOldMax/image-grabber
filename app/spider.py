@@ -33,7 +33,7 @@ class Spider(Spider):
                 self.request_item.status = self.result_status
                 self.request_item.info = self.info
                 db.session.commit()
-                with app.app_context():
+                with app.test_request_context('/'):
                     socketio.emit('finish', 'finish', namespace='/main')
                 eventlet.sleep(0)
                 self.stop()
@@ -49,7 +49,7 @@ class Spider(Spider):
             self.request_item.status = self.result_status
             self.request_item.info = self.info
             db.session.commit()
-            with app.app_context():
+            with app.test_request_context('/'):
                 socketio.emit('finish', 'finish', namespace='/main')
             eventlet.sleep(0)
             self.stop()
@@ -63,7 +63,7 @@ class Spider(Spider):
                     self.request_item.status = self.result_status
                     self.request_item.info = self.info
                     db.session.commit()
-                    with app.app_context():
+                    with app.test_request_context('/'):
                         socketio.emit('finish', 'finish', namespace='/main')
                     eventlet.sleep(0)
                     self.stop()
@@ -73,13 +73,12 @@ class Spider(Spider):
                 filename = hash + src.split('/')[-1]
                 self.downloader.retrieve(src, 'app/static/images/' + filename)
                 self.result_counter += 1
-                eventlet.sleep(0)
                 image_item = Image(
                     self.request_item,
                     src,
                     filename)
                 db.session.add(image_item)
-                with app.app_context():
+                with app.test_request_context('/'):
                     socketio.emit('grabed_count', self.result_counter, namespace='/main')
                 eventlet.sleep(0)
             except Exception as e:

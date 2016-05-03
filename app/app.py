@@ -57,7 +57,7 @@ def dropTable():
 
 @socketio.on('grab_crawler', namespace='/main')
 def grab_crawler(data):
-    bot = Spider(thread_number=1)
+    bot = Spider()
     bot.initial_urls = [data['site_url']]
     bot.total = data['image_count']
     bot.result_status = 'inprogress'
