@@ -61,6 +61,7 @@ def grab_crawler(data):
     bot.initial_urls = [data['site_url']]
     bot.total = data['image_count']
     bot.result_status = 'inprogress'
+    bot.image_type = data['image_type']
     bot.run()
 
 @socketio.on('grab_single', namespace='/main')
@@ -85,6 +86,10 @@ def grab_single(data):
                 status = 'success'
                 break
             src = image.attr('src')
+            res = urllib.urlopen(src)
+            http_message = res.info()
+            if data['image_type'] != 'all' and data['image_type'] != http_message.type:
+                continue
             hash = os.urandom(16).encode('hex')
             filename = hash + src.split('/')[-1]
             downloader.retrieve(src, 'app/static/images/' + filename)

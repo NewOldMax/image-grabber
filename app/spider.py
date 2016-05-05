@@ -33,7 +33,7 @@ class Spider(Spider):
                 self.request_item.status = self.result_status
                 self.request_item.info = self.info
                 db.session.commit()
-                with app.test_request_context('/'):
+                with app.app_context():
                     socketio.emit('finish', 'finish', namespace='/main')
                 eventlet.sleep(0)
                 self.stop()
@@ -49,7 +49,7 @@ class Spider(Spider):
             self.request_item.status = self.result_status
             self.request_item.info = self.info
             db.session.commit()
-            with app.test_request_context('/'):
+            with app.app_context():
                 socketio.emit('finish', 'finish', namespace='/main')
             eventlet.sleep(0)
             self.stop()
@@ -63,12 +63,16 @@ class Spider(Spider):
                     self.request_item.status = self.result_status
                     self.request_item.info = self.info
                     db.session.commit()
-                    with app.test_request_context('/'):
+                    with app.app_context():
                         socketio.emit('finish', 'finish', namespace='/main')
                     eventlet.sleep(0)
                     self.stop()
                     return
                 src = image.attr('src')
+                res = urllib.urlopen(src)
+                http_message = res.info()
+                if self.image_type != 'all' and self.image_type != http_message.type:
+                    continue
                 hash = os.urandom(16).encode('hex')
                 filename = hash + src.split('/')[-1]
                 self.downloader.retrieve(src, 'app/static/images/' + filename)
@@ -78,7 +82,7 @@ class Spider(Spider):
                     src,
                     filename)
                 db.session.add(image_item)
-                with app.test_request_context('/'):
+                with app.app_context():
                     socketio.emit('grabed_count', self.result_counter, namespace='/main')
                 eventlet.sleep(0)
             except Exception as e:

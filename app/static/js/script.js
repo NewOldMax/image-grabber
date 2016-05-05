@@ -19,7 +19,8 @@ $(document).ready(function(){
         var count = form.find('#image_count').val();
         var url = form.find('#site_url').val();
         var event = 'grab_'+form.find('#work_type').val();
-        send(event, url, count);
+        var type = form.find('#image_type').val();
+        send(event, url, count, type);
         startLoading($('body'));
         $('#current').text(0);
         $('#total').text(count);
@@ -27,10 +28,11 @@ $(document).ready(function(){
     });
 })
 
-function send(event, url, count) {
+function send(event, url, count, type) {
     socket.emit(event, {
         site_url: url,
-        image_count: parseInt(count)
+        image_count: parseInt(count),
+        image_type: type
     });
 }
 

@@ -31,6 +31,15 @@
                 {% endfor %}
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{form.image_type.label}}
+                {{form.image_type(class='form-control', required=true)}}
+                {% for error in form.errors.image_type %}
+                    <p class="text-danger text-left">[{{error}}]</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
     <button type="submit" class="btn btn-primary btn-lg btn-block">Grab</button>
 </form>
